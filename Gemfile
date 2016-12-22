@@ -7,8 +7,7 @@ gem 'pg'
 gem 'therubyracer', platforms: :ruby
 gem 'devise'
 
-# Use SCSS for stylesheets
-gem 'bootstrap-sass', '~> 3.3.5'
+gem 'bootstrap', '~> 4.0.0.alpha5'
 gem 'sass-rails', '~> 5.0'
 gem 'font-awesome-rails'
 
