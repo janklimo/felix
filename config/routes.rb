@@ -6,4 +6,8 @@ Rails.application.routes.draw do
     passwords: 'admins/passwords'
   }
   root to: "home#index"
+
+  namespace :admin do
+    get :home
+  end
 end
