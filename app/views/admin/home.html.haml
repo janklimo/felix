@@ -1,1 +1,9 @@
 %h3 This is your home, welcome!
+
+- if current_admin.company
+  %p Awesome, you already have a company
+  = link_to "Edit", edit_company_path(current_admin.company.id),
+    class: "btn btn-primary"
+- else
+  %p Create your company now
+  = link_to "Create", new_company_path, class: "btn btn-primary"

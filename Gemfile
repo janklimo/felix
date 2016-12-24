@@ -6,6 +6,8 @@ gem 'rails', '4.2.7'
 gem 'pg'
 gem 'therubyracer', platforms: :ruby
 gem 'devise'
+gem 'cancancan'
+gem 'simple_form'
 
 gem 'bootstrap', '~> 4.0.0.alpha5'
 gem 'sass-rails', '~> 5.0'

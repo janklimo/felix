@@ -12,8 +12,9 @@ RSpec.configure do |config|
   end
 
   config.include FactoryGirl::Syntax::Methods
-  config.mock_with :rspec
+  config.include Devise::Test::ControllerHelpers, type: :controller
 
+  config.mock_with :rspec
   config.use_transactional_fixtures = false
 
   config.before(:suite) do
