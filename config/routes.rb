@@ -13,4 +13,7 @@ Rails.application.routes.draw do
   end
 
   resources :companies, only: [:create, :update, :new, :edit]
+
+  # endpoint to receive LINE callbacks
+  post 'callback', to: 'bot#callback'
 end

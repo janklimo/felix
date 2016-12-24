@@ -8,6 +8,7 @@ gem 'therubyracer', platforms: :ruby
 gem 'devise'
 gem 'cancancan'
 gem 'simple_form'
+gem 'line-bot-api'
 
 gem 'bootstrap', '~> 4.0.0.alpha5'
 gem 'sass-rails', '~> 5.0'
