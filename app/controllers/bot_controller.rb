@@ -1,4 +1,6 @@
 class BotController < ApplicationController
+  skip_before_action :verify_authenticity_token
+
   def callback
     body = request.body.read
     signature = request.env['HTTP_X_LINE_SIGNATURE']
