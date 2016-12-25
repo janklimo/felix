@@ -1,0 +1,9 @@
+{
+  "replyToken": "T1234",
+  "type": "follow",
+  "timestamp": 1462629479859,
+  "source": {
+    "type": "user",
+    "userId": "U1234"
+  }
+}

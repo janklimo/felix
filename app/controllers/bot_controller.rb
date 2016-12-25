@@ -16,11 +16,23 @@ class BotController < ApplicationController
     events.each do |event|
       case event
       when Line::Bot::Event::Follow
-        message = {
+        # get user display name
+        res = client.get_profile(event['source']['userId'])
+        profile = JSON.parse(res.body)
+        hello_message = {
           type: 'text',
-          text: "New friend: #{event.inspect}"
+          text: "Hello #{profile['displayName']}! " \
+            "I'm Felix, your team happiness bot :) Let's get started 😻"
         }
-        client.reply_message(event['replyToken'], message)
+        request_password_message = {
+          type: 'text',
+          text: "Let me find your company 🚀 Please send me your team's secret " \
+            "keyword so I can securely identify it."
+        }
+        client.reply_message(event['replyToken'], [
+          hello_message,
+          request_password_message
+        ])
       when Line::Bot::Event::Message
         case event.type
         when Line::Bot::Event::MessageType::Text

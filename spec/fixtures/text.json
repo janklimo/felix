@@ -1,0 +1,14 @@
+{
+  "replyToken": "T1234",
+  "type": "message",
+  "timestamp": 1462629479859,
+  "source": {
+    "type": "user",
+    "userId": "U1234"
+  },
+  "message": {
+    "id": "325708",
+    "type": "text",
+    "text": "Hello, world"
+  }
+}
