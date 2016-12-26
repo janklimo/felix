@@ -43,8 +43,8 @@ class BotController < ApplicationController
         when Line::Bot::Event::MessageType::Text
           message = {
             type: 'image',
-            originalContentUrl: "https://maps.googleapis.com/maps/api/staticmap?center=Brooklyn+Bridge,New+York,NY&zoom=13&size=600x300&maptype=roadmap&markers=color:blue%7Clabel:S%7C40.702147,-74.015794&format=jpg",
-            previewImageUrl: 'https://maps.googleapis.com/maps/api/staticmap?center=Brooklyn+Bridge,New+York,NY&zoom=13&size=600x300&maptype=roadmap&markers=color:blue%7Clabel:S%7C40.702147,-74.015794&format=jpg'
+            originalContentUrl: "https://maps.googleapis.com/maps/api/staticmap?zoom=15&size=1024x1024&maptype=roadmap&markers=color:blue%7Clabel:S%7C40.702147,-74.015794",
+            previewImageUrl: 'https://maps.googleapis.com/maps/api/staticmap?zoom=12&size=240x240&maptype=roadmap&markers=color:blue%7Clabel:S%7C40.702147,-74.015794'
           }
           client.reply_message(event['replyToken'], message)
         end
