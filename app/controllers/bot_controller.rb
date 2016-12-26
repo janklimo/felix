@@ -14,15 +14,20 @@ class BotController < ApplicationController
 
     events = client.parse_events_from(body)
     events.each do |event|
+      user_id = event['source']['userId']
+
       case event
       when Line::Bot::Event::Follow
+        # save the user record
+        User.create(external_id: user_id)
+
         # get user display name
-        res = client.get_profile(event['source']['userId'])
+        res = client.get_profile(user_id)
         profile = JSON.parse(res.body)
         hello_message = {
           type: 'text',
           text: "Hello #{profile['displayName']}! " \
-            "I'm Felix, your team happiness bot :) Let's get started 😻"
+            "I'm Felix, your team happiness bot 😻 Let's get started!"
         }
         request_password_message = {
           type: 'text',
@@ -37,8 +42,8 @@ class BotController < ApplicationController
         case event.type
         when Line::Bot::Event::MessageType::Text
           message = {
-            type: 'text',
-            text: "Text message: #{event.inspect}"
+            type: 'image',
+            originalContentUrl: "https://maps.googleapis.com/maps/api/staticmap?center=Brooklyn+Bridge,New+York,NY&zoom=13&size=600x300&maptype=roadmap&markers=color:blue%7Clabel:S%7C40.702147,-74.015794"
           }
           client.reply_message(event['replyToken'], message)
         end

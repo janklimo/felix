@@ -15,5 +15,9 @@ FactoryGirl.define do
     latitude 40.712784
     longitude 74.005941
   end
+
+  factory :user do
+    external_id 'U1234'
+  end
 end
 
