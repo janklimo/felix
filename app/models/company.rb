@@ -7,6 +7,20 @@ class Company < ActiveRecord::Base
 
   before_validation :normalize_password
 
+  def map_message
+    {
+      type: 'image',
+      previewImageUrl: "http://maps.googleapis.com/maps/api/staticmap?" \
+        "zoom=16&size=240x240&maptype=roadmap&" \
+        "markers=icon:https://s3.amazonaws.com/felixthebot/marker.png|" \
+        "#{latitude},#{longitude}",
+      originalContentUrl: "http://maps.googleapis.com/maps/api/staticmap?" \
+        "zoom=16&size=1024x1024&maptype=roadmap&" \
+        "markers=icon:https://s3.amazonaws.com/felixthebot/marker.png|" \
+        "#{latitude},#{longitude}"
+    }
+  end
+
   private
 
   def normalize_password

@@ -21,34 +21,53 @@ class BotController < ApplicationController
         # save the user record
         User.create(external_id: user_id)
 
-        # get user display name
-        res = client.get_profile(user_id)
-        profile = JSON.parse(res.body)
         hello_message = {
           type: 'text',
-          text: "Hello #{profile['displayName']}! " \
+          text: "Hello amazing! " \
             "I'm Felix, your team happiness bot 😻 Let's get started!"
         }
         request_password_message = {
           type: 'text',
-          text: "Let me find your company 🚀 Please send me your team's secret " \
-            "keyword so I can securely identify it."
+          text: "First of all, let me find your company 🚀 Please send me " \
+            "your team's secret keyword so I can securely identify it."
         }
-        client.reply_message(event['replyToken'], [
-          hello_message,
-          request_password_message
-        ])
+        payload = [hello_message, request_password_message]
       when Line::Bot::Event::Message
         case event.type
         when Line::Bot::Event::MessageType::Text
-          message = {
-            type: 'image',
-            originalContentUrl: "https://maps.googleapis.com/maps/api/staticmap?zoom=15&size=1024x1024&maptype=roadmap&markers=color:blue%7Clabel:S%7C40.702147,-74.015794",
-            previewImageUrl: 'https://maps.googleapis.com/maps/api/staticmap?zoom=12&size=240x240&maptype=roadmap&markers=color:blue%7Clabel:S%7C40.702147,-74.015794'
-          }
-          client.reply_message(event['replyToken'], message)
+          user = User.find_by(external_id: user_id)
+          text = event['message']['text'].upcase
+
+          if user && user.pending_password?
+            if keyword = Company.pluck(:password).find { |str| text.include? str }
+              found_company = Company.find_by(password: keyword)
+              user.update(company: found_company, status: :pending_location)
+              company_found_message = {
+                type: 'text',
+                text: "Found it 🤗 Welcome to team #{found_company.name}!"
+              }
+              request_location_message = {
+                type: 'text',
+                text: "As a final step to get verified, please share your " \
+                  "location with me once you are " \
+                  "in #{found_company.name}'s office 🎯 Here's the map:"
+              }
+              payload = [
+                company_found_message,
+                request_location_message,
+                found_company.map_message
+              ]
+            else
+              company_not_found_message = {
+                type: 'text',
+                text: "That doesn't match any of the companies I know 😞. Please try again!"
+              }
+              payload = [ company_not_found_message ]
+            end
+          end
         end
       end
+      client.reply_message(event['replyToken'], payload) if payload
     end
 
     head :ok

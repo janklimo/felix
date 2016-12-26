@@ -39,4 +39,17 @@ describe Company, type: :model do
       expect(company).to be_valid
     end
   end
+
+  describe 'map_message' do
+    before do
+      @company = create(:company, latitude: 10.1234, longitude: -200.58)
+    end
+    it 'returns the message object' do
+      expect(@company.map_message[:type]).to eq 'image'
+      expect(@company.map_message[:previewImageUrl]).to include '240x240'
+      expect(@company.map_message[:previewImageUrl]).to include '10.1234,-200.58'
+      expect(@company.map_message[:originalContentUrl]).to include '1024x1024'
+      expect(@company.map_message[:originalContentUrl]).to include '10.1234,-200.58'
+    end
+  end
 end
