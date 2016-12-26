@@ -10,14 +10,18 @@ class Company < ActiveRecord::Base
   def map_message
     {
       type: 'image',
-      previewImageUrl: "http://maps.googleapis.com/maps/api/staticmap?" \
+      previewImageUrl: URI.encode(
+        "https://maps.googleapis.com/maps/api/staticmap?" \
         "zoom=16&size=240x240&maptype=roadmap&" \
         "markers=icon:https://s3.amazonaws.com/felixthebot/marker.png|" \
-        "#{latitude},#{longitude}&key=#{ENV['GOOGLE_MAPS_KEY']}",
-      originalContentUrl: "http://maps.googleapis.com/maps/api/staticmap?" \
+        "#{latitude},#{longitude}&key=#{ENV['GOOGLE_MAPS_KEY']}"
+      ),
+      originalContentUrl: URI.encode(
+        "https://maps.googleapis.com/maps/api/staticmap?" \
         "zoom=16&size=1024x1024&maptype=roadmap&" \
         "markers=icon:https://s3.amazonaws.com/felixthebot/marker.png|" \
         "#{latitude},#{longitude}&key=#{ENV['GOOGLE_MAPS_KEY']}"
+      )
     }
   end
 
