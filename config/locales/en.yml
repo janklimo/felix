@@ -1,23 +1,10 @@
-# Files in the config/locales directory are used for internationalization
-# and are automatically loaded by Rails. If you want to use locales other
-# than English, add the necessary files in this directory.
-#
-# To use the locales, use `I18n.t`:
-#
-#     I18n.t 'hello'
-#
-# In views, this is aliased to just `t`:
-#
-#     <%= t('hello') %>
-#
-# To use a different locale, set it with `I18n.locale`:
-#
-#     I18n.locale = :es
-#
-# This would use the information in config/locales/es.yml.
-#
-# To learn more, please read the Rails Internationalization guide
-# available at http://guides.rubyonrails.org/i18n.html.
-
 en:
-  hello: "Hello world"
+  company_found: "Found it 🤗 Welcome to team %{name}!"
+  company_not_found: "That doesn't match any of the companies
+    I know 😞. Please try again!"
+  hello: "Hello amazing! I'm Felix, your team happiness
+    bot 😻 Let's get started!"
+  request_location: "As a final step to get verified, please share your
+    location with me once you are in %{name}'s office 🎯 Here's the map:"
+  request_password: "First of all, let me find your company 🚀 Please
+    send me your team's secret keyword so I can securely identify it."

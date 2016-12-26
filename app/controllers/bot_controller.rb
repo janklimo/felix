@@ -20,18 +20,10 @@ class BotController < ApplicationController
       when Line::Bot::Event::Follow
         # save the user record
         User.create(external_id: user_id)
-
-        hello_message = {
-          type: 'text',
-          text: "Hello amazing! " \
-            "I'm Felix, your team happiness bot 😻 Let's get started!"
-        }
-        request_password_message = {
-          type: 'text',
-          text: "First of all, let me find your company 🚀 Please send me " \
-            "your team's secret keyword so I can securely identify it."
-        }
-        payload = [hello_message, request_password_message]
+        payload = [
+          text(I18n.t('hello')),
+          text(I18n.t('request_password'))
+        ]
       when Line::Bot::Event::Message
         case event.type
         when Line::Bot::Event::MessageType::Text
@@ -42,27 +34,13 @@ class BotController < ApplicationController
             if keyword = Company.pluck(:password).find { |str| text.include? str }
               found_company = Company.find_by(password: keyword)
               user.update(company: found_company, status: :pending_location)
-              company_found_message = {
-                type: 'text',
-                text: "Found it 🤗 Welcome to team #{found_company.name}!"
-              }
-              request_location_message = {
-                type: 'text',
-                text: "As a final step to get verified, please share your " \
-                  "location with me once you are " \
-                  "in #{found_company.name}'s office 🎯 Here's the map:"
-              }
               payload = [
-                company_found_message,
-                request_location_message,
+                text(I18n.t('company_found', name: found_company.name)),
+                text(I18n.t('request_location', name: found_company.name)),
                 found_company.map_message
               ]
             else
-              company_not_found_message = {
-                type: 'text',
-                text: "That doesn't match any of the companies I know 😞. Please try again!"
-              }
-              payload = [ company_not_found_message ]
+              payload = text(I18n.t('company_not_found'))
             end
           end
         end
@@ -80,5 +58,12 @@ class BotController < ApplicationController
       config.channel_secret = ENV["LINE_CHANNEL_SECRET"]
       config.channel_token = ENV["LINE_CHANNEL_TOKEN"]
     end
+  end
+
+  def text(content)
+    {
+      type: 'text',
+      text: content
+    }
   end
 end

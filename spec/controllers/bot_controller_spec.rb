@@ -81,9 +81,9 @@ describe BotController, type: :controller do
       end
       it 'updates the user status' do
         expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
-          .with('T1234', [
+          .with('T1234',
             hash_including(text: /doesn't match any of the companies/)
-          ])
+          )
         post :callback
         expect(@user.reload.company).to eq nil
         expect(@user.reload.status).to eq 'pending_password'
