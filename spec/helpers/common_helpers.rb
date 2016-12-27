@@ -14,6 +14,11 @@ def mock_follow
   { "events" => [ data ] }
 end
 
+def mock_location
+  data = JSON.parse(read_fixtures('location.json'))
+  { "events" => [ data ] }
+end
+
 def mock_profile
   JSON.parse(read_fixtures('profile.json'))
 end

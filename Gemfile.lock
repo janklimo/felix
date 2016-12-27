@@ -92,6 +92,7 @@ GEM
     font-awesome-rails (4.7.0.1)
       railties (>= 3.2, < 5.1)
     formatador (0.2.5)
+    geocoder (1.4.1)
     globalid (0.3.7)
       activesupport (>= 4.1.0)
     guard (2.14.0)
@@ -291,6 +292,7 @@ DEPENDENCIES
   devise
   factory_girl_rails
   font-awesome-rails
+  geocoder
   guard
   guard-livereload
   haml (~> 4.0.7)

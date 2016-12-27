@@ -6,6 +6,7 @@ describe BotController, type: :controller do
       .to receive(:get_profile).and_return double(body: 'anything')
     allow_any_instance_of(Line::Bot::Client)
       .to receive(:validate_signature).and_return 'all good'
+    @company = create(:company, password: 'TOKEN')
   end
 
   describe 'new follow event' do
@@ -32,7 +33,6 @@ describe BotController, type: :controller do
   describe 'pending password' do
     before do
       @user = create(:user, external_id: 'U1234')
-      @company = create(:company, password: 'TOKEN')
     end
     context 'company is found' do
       context 'token matches' do
@@ -87,6 +87,41 @@ describe BotController, type: :controller do
         post :callback
         expect(@user.reload.company).to eq nil
         expect(@user.reload.status).to eq 'pending_password'
+      end
+    end
+  end
+
+  describe 'pending_location' do
+    before do
+      @user = create(:user, external_id: 'U1234', status: :pending_location,
+                    company: create(:company))
+      allow(JSON).to receive(:parse).and_return mock_location
+    end
+    context 'company is found' do
+      before do
+        allow(Geocoder::Calculations).to receive(:distance_between)
+          .and_return 0.0001
+      end
+      it 'updates the user status' do
+        expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
+          .with('T1234', [
+            hash_including(text: /verified member of team Gotham/),
+            hash_including(text: /100% anonymous/),
+          ])
+        post :callback
+        expect(@user.reload.status).to eq 'verified'
+      end
+    end
+    context 'company is not found' do
+      before do
+        allow(Geocoder::Calculations).to receive(:distance_between)
+          .and_return 1
+      end
+      it 'does not update user status' do
+        expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
+          .with('T1234', hash_including(text: /doesn't seem to be/))
+        post :callback
+        expect(@user.reload.status).to eq 'pending_location'
       end
     end
   end

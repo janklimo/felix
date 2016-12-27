@@ -25,6 +25,10 @@ class Company < ActiveRecord::Base
     }
   end
 
+  def coordinates
+    [ latitude, longitude ]
+  end
+
   private
 
   def normalize_password

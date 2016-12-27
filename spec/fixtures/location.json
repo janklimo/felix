@@ -1,0 +1,17 @@
+{
+  "replyToken": "T1234",
+  "type": "message",
+  "timestamp": 1462629479859,
+  "source": {
+    "type": "user",
+    "userId": "U1234"
+  },
+  "message": {
+    "id": "325708",
+    "type": "location",
+    "title": "my location",
+    "address": "Lúčna štvrť 1112/34 962 12 Detva, Slovakia",
+    "latitude": 48.55300435194563,
+    "longitude": 19.41462378948927
+  }
+}

@@ -55,4 +55,13 @@ describe Company, type: :model do
       expect(@company.map_message[:originalContentUrl]).to include 'key=token'
     end
   end
+
+  describe 'coordinates' do
+    before do
+      @company = create(:company, latitude: 11, longitude: -22)
+    end
+    it 'returns an array of coordinates' do
+      expect(@company.coordinates).to eq [11, -22]
+    end
+  end
 end

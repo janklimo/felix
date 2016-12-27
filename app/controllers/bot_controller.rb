@@ -25,9 +25,10 @@ class BotController < ApplicationController
           text(I18n.t('request_password'))
         ]
       when Line::Bot::Event::Message
+        user = User.find_by(external_id: user_id)
+
         case event.type
         when Line::Bot::Event::MessageType::Text
-          user = User.find_by(external_id: user_id)
           text = event['message']['text'].upcase
 
           if user && user.pending_password?
@@ -41,6 +42,25 @@ class BotController < ApplicationController
               ]
             else
               payload = text(I18n.t('company_not_found'))
+            end
+          end
+        when Line::Bot::Event::MessageType::Location
+          latitude = event['message']['latitude']
+          longitude = event['message']['longitude']
+          if user && user.pending_location?
+            company = user.company
+            dist = Geocoder::Calculations.distance_between(
+              company.coordinates, [latitude, longitude], units: :km
+            )
+            # approve the user if he's reasonably close - deviations happen
+            if dist < 0.2
+              user.update(status: :verified)
+              payload = [
+                text(I18n.t('location_found', name: company.name)),
+                text(I18n.t('what_happens_next'))
+              ]
+            else
+              payload = text(I18n.t('location_not_found'))
             end
           end
         end
