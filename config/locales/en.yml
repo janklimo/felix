@@ -4,13 +4,10 @@ en:
     I know 😞. Please try again!"
   hello: "Hello amazing! I'm Felix, your team happiness
     bot 😻 Let's get started!"
-  location_found: "Yay! You are now a verified member of team %{name} 😻"
-  location_not_found: "That doesn't seem to be your office."
-  request_location: "As a final step to get verified, please share your
-    location with me once you are in %{name}'s office 🎯 Here's the map:"
-  request_password: "First of all, let me find your company 🚀 Please
-    send me your team's secret keyword so I can securely identify it."
-  what_happens_next: "Every now and then I will send you a question
-    about how you're feeling at work. Your responses are 100% anonymous
-    so don't be afraid to say what you think. That's it for now,
-    talk to you soon!"
+  request_password: "First of all, let me find your company 🚀 All I need
+    is your personal secret keyword you received from your admin
+    so I can securely identify it."
+  what_happens_next: "Great job completing the registration 👏
+    Soon I will start sending you questions about how you're
+    feeling at work. Your responses are 100% anonymous so don't be
+    afraid to say what you think. That's it for now, talk to you soon!"

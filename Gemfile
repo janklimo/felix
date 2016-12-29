@@ -9,7 +9,6 @@ gem 'devise'
 gem 'cancancan'
 gem 'simple_form'
 gem 'line-bot-api'
-gem 'geocoder'
 
 gem 'bootstrap', '~> 4.0.0.alpha5'
 gem 'sass-rails', '~> 5.0'
@@ -28,6 +27,8 @@ group :test do
   gem 'factory_girl_rails'
   gem 'database_cleaner'
   gem 'webmock'
+  gem 'capybara-webkit'
+  gem 'test_after_commit'
 end
 
 group :development, :test do

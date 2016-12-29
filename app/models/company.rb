@@ -1,37 +1,18 @@
 class Company < ActiveRecord::Base
   belongs_to :admin
+  has_many :tokens
 
   validates :name, presence: true
-  validates :password, presence: true, uniqueness: true
-  validates :latitude, :longitude, numericality: true
+  validates :size, numericality: { greater_than: 0 }
 
-  before_validation :normalize_password
-
-  def map_message
-    {
-      type: 'image',
-      previewImageUrl: URI.encode(
-        "https://maps.googleapis.com/maps/api/staticmap?" \
-        "zoom=16&size=240x240&maptype=roadmap&" \
-        "markers=icon:https://s3.amazonaws.com/felixthebot/marker.png|" \
-        "#{latitude},#{longitude}&key=#{ENV['GOOGLE_MAPS_KEY']}"
-      ),
-      originalContentUrl: URI.encode(
-        "https://maps.googleapis.com/maps/api/staticmap?" \
-        "zoom=16&size=1024x1024&maptype=roadmap&" \
-        "markers=icon:https://s3.amazonaws.com/felixthebot/marker.png|" \
-        "#{latitude},#{longitude}&key=#{ENV['GOOGLE_MAPS_KEY']}"
-      )
-    }
-  end
-
-  def coordinates
-    [ latitude, longitude ]
-  end
+  after_commit :generate_tokens, on: :create
 
   private
 
-  def normalize_password
-    self.password = self.password.upcase if self.password
+  def generate_tokens
+    # generate extra tokens for future team members + to reinforce anonymity
+    (self.size * 1.5).to_i.times do
+      self.tokens << Token.create
+    end
   end
 end

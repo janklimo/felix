@@ -7,6 +7,8 @@ require 'webmock/rspec'
 
 Dir[Rails.root.join("spec/helpers/**/*.rb")].each { |f| require f }
 
+Capybara.javascript_driver = :webkit
+
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|
     expectations.include_chain_clauses_in_custom_matcher_descriptions = true
@@ -14,6 +16,7 @@ RSpec.configure do |config|
 
   config.include FactoryGirl::Syntax::Methods
   config.include Devise::Test::ControllerHelpers, type: :controller
+  config.include Warden::Test::Helpers
 
   config.mock_with :rspec
   config.use_transactional_fixtures = false
@@ -34,5 +37,6 @@ RSpec.configure do |config|
 
   config.after(:each) do
     DatabaseCleaner.clean
+    Warden.test_reset!
   end
 end

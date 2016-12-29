@@ -11,9 +11,10 @@ FactoryGirl.define do
 
   factory :company do
     name 'Gotham Industries'
-    password 'GOTHAM4EVER'
-    latitude 40.712784
-    longitude 74.005941
+    size 2
+  end
+
+  factory :token do
   end
 
   factory :user do

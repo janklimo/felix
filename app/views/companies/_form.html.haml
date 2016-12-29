@@ -1,6 +1,5 @@
 = simple_form_for @company, html: { class: 'form-vertical' } do |f|
   = f.input :name, label: 'Your company name'
-  = f.input :password, as: :string, label: 'Your secret keyword'
-  = f.input :latitude
-  = f.input :longitude
+  = f.input :size, label: 'How big is your team?', type: 'number',
+    placeholder: 'Number of people'
   = f.button :submit, class: 'btn btn-primary'

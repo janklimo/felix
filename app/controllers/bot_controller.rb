@@ -31,36 +31,18 @@ class BotController < ApplicationController
         when Line::Bot::Event::MessageType::Text
           text = event['message']['text'].upcase
 
-          if user && user.pending_password?
-            if keyword = Company.pluck(:password).find { |str| text.include? str }
-              found_company = Company.find_by(password: keyword)
-              user.update(company: found_company, status: :pending_location)
+          if user && user.pending?
+            if keyword = Token.pluck(:name).find { |str| text.include? str }
+              token = Token.find_by(name: keyword)
+              token.update(user: user)
+              found_company = token.company
+              user.update(company: found_company, status: :verified)
               payload = [
                 text(I18n.t('company_found', name: found_company.name)),
-                text(I18n.t('request_location', name: found_company.name)),
-                found_company.map_message
-              ]
-            else
-              payload = text(I18n.t('company_not_found'))
-            end
-          end
-        when Line::Bot::Event::MessageType::Location
-          latitude = event['message']['latitude']
-          longitude = event['message']['longitude']
-          if user && user.pending_location?
-            company = user.company
-            dist = Geocoder::Calculations.distance_between(
-              company.coordinates, [latitude, longitude], units: :km
-            )
-            # approve the user if he's reasonably close - deviations happen
-            if dist < 0.2
-              user.update(status: :verified)
-              payload = [
-                text(I18n.t('location_found', name: company.name)),
                 text(I18n.t('what_happens_next'))
               ]
             else
-              payload = text(I18n.t('location_not_found'))
+              payload = text(I18n.t('company_not_found'))
             end
           end
         end

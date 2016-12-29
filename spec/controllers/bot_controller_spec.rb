@@ -6,7 +6,7 @@ describe BotController, type: :controller do
       .to receive(:get_profile).and_return double(body: 'anything')
     allow_any_instance_of(Line::Bot::Client)
       .to receive(:validate_signature).and_return 'all good'
-    @company = create(:company, password: 'TOKEN')
+    @company = create(:company, size: 4)
   end
 
   describe 'new follow event' do
@@ -25,52 +25,55 @@ describe BotController, type: :controller do
       post :callback
       expect(User.count).to eq 1
       user = User.first
-      expect(user.status).to eq 'pending_password'
+      expect(user.status).to eq 'pending'
       expect(user.external_id).to eq 'U1234'
     end
   end
 
-  describe 'pending password' do
+  describe 'pending secret token' do
     before do
       @user = create(:user, external_id: 'U1234')
+      @token = Token.last
     end
     context 'company is found' do
       context 'token matches' do
         before do
-          allow(JSON).to receive(:parse).and_return mock_text('TOKEN')
+          allow(JSON).to receive(:parse).and_return mock_text(@token.name)
         end
-        it 'updates the user status' do
+        it 'updates the user status and token itself' do
           expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
             .with('T1234', [
               hash_including(text: /Welcome to team Gotham Industries!/),
-              hash_including(text: /please share your location/),
-              hash_including(originalContentUrl: /staticmap/)
+              hash_including(text: /Great job completing/),
             ])
           post :callback
           expect(@user.reload.company).to eq @company
-          expect(@user.reload.status).to eq 'pending_location'
+          expect(@user.reload.status).to eq 'verified'
+          expect(@token.reload.user).to eq @user
         end
       end
 
       context 'the token is in the wrong case' do
         before do
-          allow(JSON).to receive(:parse).and_return mock_text('tokEN')
+          allow(JSON).to receive(:parse)
+            .and_return mock_text(@token.name.downcase)
         end
         it 'updates the user status' do
           post :callback
           expect(@user.reload.company).to eq @company
-          expect(@user.reload.status).to eq 'pending_location'
+          expect(@user.reload.status).to eq 'verified'
         end
       end
 
       context 'the token is a part of a sentence' do
         before do
-          allow(JSON).to receive(:parse).and_return mock_text('my password is Token :)')
+          allow(JSON).to receive(:parse)
+            .and_return mock_text("my password is #{@token.name} :)")
         end
         it 'updates the user status' do
           post :callback
           expect(@user.reload.company).to eq @company
-          expect(@user.reload.status).to eq 'pending_location'
+          expect(@user.reload.status).to eq 'verified'
         end
       end
     end
@@ -86,42 +89,7 @@ describe BotController, type: :controller do
           )
         post :callback
         expect(@user.reload.company).to eq nil
-        expect(@user.reload.status).to eq 'pending_password'
-      end
-    end
-  end
-
-  describe 'pending_location' do
-    before do
-      @user = create(:user, external_id: 'U1234', status: :pending_location,
-                    company: create(:company))
-      allow(JSON).to receive(:parse).and_return mock_location
-    end
-    context 'company is found' do
-      before do
-        allow(Geocoder::Calculations).to receive(:distance_between)
-          .and_return 0.0001
-      end
-      it 'updates the user status' do
-        expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
-          .with('T1234', [
-            hash_including(text: /verified member of team Gotham/),
-            hash_including(text: /100% anonymous/),
-          ])
-        post :callback
-        expect(@user.reload.status).to eq 'verified'
-      end
-    end
-    context 'company is not found' do
-      before do
-        allow(Geocoder::Calculations).to receive(:distance_between)
-          .and_return 1
-      end
-      it 'does not update user status' do
-        expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
-          .with('T1234', hash_including(text: /doesn't seem to be/))
-        post :callback
-        expect(@user.reload.status).to eq 'pending_location'
+        expect(@user.reload.status).to eq 'pending'
       end
     end
   end
