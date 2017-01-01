@@ -14,6 +14,10 @@ FactoryGirl.define do
     size 2
   end
 
+  factory :metric do
+    name 'General'
+  end
+
   factory :token do
   end
 
