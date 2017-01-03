@@ -9,6 +9,7 @@ gem 'devise'
 gem 'cancancan'
 gem 'simple_form'
 gem 'line-bot-api'
+gem 'ranked-model'
 
 gem 'bootstrap', '~> 4.0.0.alpha5'
 gem 'sass-rails', '~> 5.0'

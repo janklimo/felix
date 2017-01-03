@@ -1,11 +1,6 @@
-# This file should contain all the record creation needed to seed the database with its default values.
-# The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
-#
-# Examples:
-#
-#   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
-#   Mayor.create(name: 'Emanuel', city: cities.first)
-#
-
 # General
-Metric.create(name: 'General')
+general = Metric.create(name: 'General')
+
+# Question #1
+Question.create(title: 'What do you think about Felix? Is tracking ' \
+                'how happy we are at work important?', metric: general)
