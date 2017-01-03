@@ -30,6 +30,7 @@ group :test do
   gem 'webmock'
   gem 'capybara-webkit'
   gem 'test_after_commit'
+  gem 'faker'
 end
 
 group :development, :test do

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170103142353) do
+ActiveRecord::Schema.define(version: 20170103145907) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -53,7 +53,10 @@ ActiveRecord::Schema.define(version: 20170103142353) do
     t.string   "name",       default: "", null: false
     t.datetime "created_at",              null: false
     t.datetime "updated_at",              null: false
+    t.string   "image_url"
   end
+
+  add_index "metrics", ["name"], name: "index_metrics_on_name", using: :btree
 
   create_table "options", force: :cascade do |t|
     t.string   "title"

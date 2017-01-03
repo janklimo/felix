@@ -1,0 +1,12 @@
+{
+  "replyToken": "nHuyWiB7yP5Zw52FIkcQobQuGDXCTA",
+  "type": "postback",
+  "timestamp": 1462629479859,
+  "source": {
+    "type": "user",
+    "userId": "U1234"
+  },
+  "postback": {
+    "data": "value: 1234"
+  }
+}

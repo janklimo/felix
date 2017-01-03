@@ -19,6 +19,11 @@ def mock_location
   { "events" => [ data ] }
 end
 
+def mock_postback
+  data = JSON.parse(read_fixtures('postback.json'))
+  { "events" => [ data ] }
+end
+
 def mock_profile
   JSON.parse(read_fixtures('profile.json'))
 end

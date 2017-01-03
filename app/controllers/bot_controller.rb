@@ -15,6 +15,7 @@ class BotController < ApplicationController
     events = client.parse_events_from(body)
     events.each do |event|
       user_id = event['source']['userId']
+      user = User.find_by(external_id: user_id)
 
       case event
       when Line::Bot::Event::Follow
@@ -25,8 +26,6 @@ class BotController < ApplicationController
           text(I18n.t('request_password'))
         ]
       when Line::Bot::Event::Message
-        user = User.find_by(external_id: user_id)
-
         case event.type
         when Line::Bot::Event::MessageType::Text
           text = event['message']['text'].upcase
@@ -44,8 +43,11 @@ class BotController < ApplicationController
             else
               payload = text(I18n.t('company_not_found'))
             end
+          elsif user && user.verified?
+            payload = template(Question.last)
           end
         end
+      when Line::Bot::Event::Postback
       end
       client.reply_message(event['replyToken'], payload) if payload
     end
@@ -66,6 +68,27 @@ class BotController < ApplicationController
     {
       type: 'text',
       text: content
+    }
+  end
+
+  def template(question)
+    metric = question.metric
+    {
+      "type": "template",
+      "altText": question.title,
+      "template": {
+        "type": "buttons",
+        "thumbnailImageUrl": metric.image_url,
+        "title": metric.name,
+        "text": question.title,
+        "actions": question.options.order(value: :desc).map do |option|
+          {
+            "type": "postback",
+            "label": option.title,
+            "data": "value: #{option.value}"
+          }
+        end
+      }
     }
   end
 end

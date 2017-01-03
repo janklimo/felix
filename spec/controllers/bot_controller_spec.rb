@@ -98,9 +98,16 @@ describe BotController, type: :controller do
     before do
       @user = create(:user, external_id: 'U1234', status: :verified)
       allow(JSON).to receive(:parse).and_return mock_text('tokEN')
+      metric = create(:metric, name: 'General')
+      question = create(:question, metric: metric)
+      question.options << create(:option)
     end
     it 'does not send anything' do
-      expect_any_instance_of(Line::Bot::Client).not_to receive(:reply_message)
+      # TODO: check the right payload content
+      expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
+        .with('T1234',
+          hash_including(type: /template/)
+        )
       post :callback
     end
   end
