@@ -49,7 +49,8 @@ class BotController < ApplicationController
         end
       when Line::Bot::Event::Postback
       end
-      client.reply_message(event['replyToken'], payload) if payload
+      res = client.reply_message(event['replyToken'], payload) if payload
+      p res.body
     end
 
     head :ok
