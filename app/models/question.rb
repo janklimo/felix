@@ -3,4 +3,5 @@ class Question < ActiveRecord::Base
   ranks :row_order
 
   belongs_to :metric
+  has_many :options
 end
