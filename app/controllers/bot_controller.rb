@@ -48,9 +48,10 @@ class BotController < ApplicationController
           end
         end
       when Line::Bot::Event::Postback
+        payload = text(event['postback']['data'])
       end
       res = client.reply_message(event['replyToken'], payload) if payload
-      p res.body
+      p res.body if res
     end
 
     head :ok
@@ -86,7 +87,7 @@ class BotController < ApplicationController
           {
             "type": "postback",
             "label": option.title,
-            "data": "value: #{option.value}"
+            "data": "You chose: #{option.title}"
           }
         end
       }
