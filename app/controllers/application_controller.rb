@@ -5,11 +5,9 @@ class ApplicationController < ActionController::Base
 
   rescue_from CanCan::AccessDenied do |exception|
     if current_admin
-      flash[:alert] = "Access to that page has been denied."
-      redirect_to root_path
+      redirect_to root_path, alert: "Access to that page has been denied."
     else
-      flash[:notice] = "Please log in to access that page."
-      redirect_to new_admin_session_path
+      redirect_to new_admin_session_path, notice: "Please log in to access that page."
     end
   end
 

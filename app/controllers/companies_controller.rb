@@ -10,8 +10,7 @@ class CompaniesController < ApplicationController
     @company = Company.new(company_params)
     @company.admin_id = current_admin.id
     if @company.save
-      flash[:notice] = "Yay! Your company has been created."
-      redirect_to admin_home_path
+      redirect_to admin_home_path, notice: "Yay! Your company has been created."
     else
       render :new
     end
@@ -24,8 +23,7 @@ class CompaniesController < ApplicationController
   def update
     authorize! :manage, @company
     if @company.update(company_params)
-      flash[:notice] = "Yay! Your company has been updated."
-      redirect_to admin_home_path
+      redirect_to admin_home_path, notice: "Yay! Your company has been updated."
     else
       render :edit
     end

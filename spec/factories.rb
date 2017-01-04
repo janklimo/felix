@@ -7,6 +7,10 @@ FactoryGirl.define do
     after(:build) do |u|
       u.skip_confirmation!
     end
+
+    trait :superadmin do
+      superadmin true
+    end
   end
 
   factory :company do

@@ -1,4 +1,15 @@
 Rails.application.routes.draw do
+  namespace :cms do
+    resources :companies
+    resources :metrics
+    resources :options
+    resources :questions
+    resources :tokens
+    resources :users
+
+    root to: "companies#index"
+  end
+
   root to: "home#index"
 
   devise_for :admins, controllers: {
