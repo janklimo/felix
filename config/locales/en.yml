@@ -4,7 +4,9 @@ en:
     I know 😞. Please try again!"
   hello: "Hello amazing! I'm Felix, your team happiness
     bot 😻 Let's get started!"
-  request_password: "First of all, let me find your company 🚀 All I need
+  language_selection_confirmed: "That worked! Your language is now English 👍"
+  request_language_selection: "Please confirm your language."
+  request_password: "Let me find your company 🚀 All I need
     is your personal secret keyword you received from your admin
     so I can securely identify it."
   what_happens_next: "Great job completing the registration 👏

@@ -16,6 +16,9 @@ class BotController < ApplicationController
     events.each do |event|
       user_id = event['source']['userId']
       user = User.find_by(external_id: user_id)
+      if user
+        I18n.locale = user.language.to_sym
+      end
 
       case event
       when Line::Bot::Event::Follow
@@ -23,14 +26,16 @@ class BotController < ApplicationController
         User.create(external_id: user_id)
         payload = [
           text(I18n.t('hello')),
-          text(I18n.t('request_password'))
+          language_selection
         ]
       when Line::Bot::Event::Message
         case event.type
         when Line::Bot::Event::MessageType::Text
           text = event['message']['text'].upcase
 
-          if user && user.pending?
+          if user && user.pending_language?
+            payload = text(I18n.t('request_language_selection'))
+          elsif user && user.pending_password?
             if keyword = Token.pluck(:name).find { |str| text.include? str }
               token = Token.find_by(name: keyword)
               token.update(user: user)
@@ -44,11 +49,30 @@ class BotController < ApplicationController
               payload = text(I18n.t('company_not_found'))
             end
           elsif user && user.verified?
-            payload = template(Question.last)
+            payload = template_from_question(Question.last)
           end
         end
       when Line::Bot::Event::Postback
-        payload = text(event['postback']['data'])
+        value = event['postback']['data']
+
+        # let users change the language at any time
+        if user && value.include?('language')
+          language = value.split('=').last
+          I18n.locale = language.to_sym
+
+          if user.pending_language?
+            user.update(language: language, status: :pending_password)
+            payload = [
+              text(I18n.t('language_selection_confirmed')),
+              text(I18n.t('request_password'))
+            ]
+          else
+            user.update(language: language)
+            payload = text(I18n.t('language_selection_confirmed'))
+          end
+        end
+
+        # TODO: process postback data
       end
       res = client.reply_message(event['replyToken'], payload) if payload
       p res.body if res
@@ -73,7 +97,7 @@ class BotController < ApplicationController
     }
   end
 
-  def template(question)
+  def template_from_question(question)
     metric = question.metric
     {
       "type": "template",
@@ -90,6 +114,31 @@ class BotController < ApplicationController
             "data": "You chose: #{option.title}"
           }
         end
+      }
+    }
+  end
+
+  def language_selection
+    {
+      "type": "template",
+      "altText": "Please choose your language.",
+      "template": {
+        "type": "buttons",
+        "thumbnailImageUrl": "https://s3.amazonaws.com/felixthebot/hello.jpg",
+        "title": "Language",
+        "text": "What language should I speak?",
+        "actions": [
+          {
+            "type": "postback",
+            "label": 'English',
+            "data": "language=en"
+          },
+          {
+            "type": "postback",
+            "label": 'ภาษาไทย',
+            "data": "language=th"
+          }
+        ]
       }
     }
   end

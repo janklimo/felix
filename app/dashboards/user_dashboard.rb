@@ -11,6 +11,7 @@ class UserDashboard < Administrate::BaseDashboard
     company: Field::BelongsTo,
     id: Field::Number,
     external_id: Field::String,
+    language: Field::String,
     status: Field::String.with_options(searchable: false),
     created_at: Field::DateTime,
     updated_at: Field::DateTime,
@@ -26,6 +27,7 @@ class UserDashboard < Administrate::BaseDashboard
     :id,
     :external_id,
     :status,
+    :language
   ].freeze
 
   # SHOW_PAGE_ATTRIBUTES
@@ -35,6 +37,7 @@ class UserDashboard < Administrate::BaseDashboard
     :id,
     :external_id,
     :status,
+    :language,
     :created_at,
     :updated_at,
   ].freeze
@@ -46,6 +49,7 @@ class UserDashboard < Administrate::BaseDashboard
     :company,
     :external_id,
     :status,
+    :language
   ].freeze
 
   # Overwrite this method to customize how users are displayed

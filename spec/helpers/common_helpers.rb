@@ -19,9 +19,10 @@ def mock_location
   { "events" => [ data ] }
 end
 
-def mock_postback
+def mock_postback(value = 'value=1234')
   data = JSON.parse(read_fixtures('postback.json'))
-  { "events" => [ data ] }
+  hash = { 'postback' => { 'data' => value } }
+  { "events" => [ data.deep_merge(hash) ] }
 end
 
 def mock_profile
