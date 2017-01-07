@@ -10,7 +10,8 @@ class MetricDashboard < Administrate::BaseDashboard
   ATTRIBUTE_TYPES = {
     questions: Field::HasMany,
     id: Field::Number,
-    name: Field::String,
+    en: Field::String,
+    th: Field::String,
     created_at: Field::DateTime,
     updated_at: Field::DateTime,
     image_url: Field::String,
@@ -23,7 +24,8 @@ class MetricDashboard < Administrate::BaseDashboard
   # Feel free to add, remove, or rearrange items.
   COLLECTION_ATTRIBUTES = [
     :id,
-    :name,
+    :en,
+    :th,
     :questions,
     :created_at,
   ].freeze
@@ -33,7 +35,8 @@ class MetricDashboard < Administrate::BaseDashboard
   SHOW_PAGE_ATTRIBUTES = [
     :questions,
     :id,
-    :name,
+    :en,
+    :th,
     :created_at,
     :updated_at,
     :image_url,
@@ -44,11 +47,12 @@ class MetricDashboard < Administrate::BaseDashboard
   # on the model's form (`new` and `edit`) pages.
   FORM_ATTRIBUTES = [
     :questions,
-    :name,
+    :en,
+    :th,
     :image_url,
   ].freeze
 
   def display_resource(metric)
-    metric.name
+    metric.name[:en]
   end
 end

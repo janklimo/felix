@@ -10,7 +10,8 @@ class OptionDashboard < Administrate::BaseDashboard
   ATTRIBUTE_TYPES = {
     question: Field::BelongsTo,
     id: Field::Number,
-    title: Field::String,
+    en: Field::String,
+    th: Field::String,
     value: Field::Number,
     created_at: Field::DateTime,
     updated_at: Field::DateTime,
@@ -22,9 +23,10 @@ class OptionDashboard < Administrate::BaseDashboard
   # By default, it's limited to four items to reduce clutter on index pages.
   # Feel free to add, remove, or rearrange items.
   COLLECTION_ATTRIBUTES = [
-    :question,
     :id,
-    :title,
+    :question,
+    :en,
+    :th,
     :value,
   ].freeze
 
@@ -33,7 +35,8 @@ class OptionDashboard < Administrate::BaseDashboard
   SHOW_PAGE_ATTRIBUTES = [
     :question,
     :id,
-    :title,
+    :en,
+    :th,
     :value,
     :created_at,
     :updated_at,
@@ -44,14 +47,12 @@ class OptionDashboard < Administrate::BaseDashboard
   # on the model's form (`new` and `edit`) pages.
   FORM_ATTRIBUTES = [
     :question,
-    :title,
+    :en,
+    :th,
     :value,
   ].freeze
 
-  # Overwrite this method to customize how options are displayed
-  # across all pages of the admin dashboard.
-  #
-  # def display_resource(option)
-  #   "Option ##{option.id}"
-  # end
+  def display_resource(option)
+    option.title[:en]
+  end
 end

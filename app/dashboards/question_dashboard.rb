@@ -11,7 +11,8 @@ class QuestionDashboard < Administrate::BaseDashboard
     metric: Field::BelongsTo,
     options: Field::HasMany,
     id: Field::Number,
-    title: Field::String,
+    en: Field::String,
+    th: Field::String,
     row_order: Field::Number,
     created_at: Field::DateTime,
     updated_at: Field::DateTime,
@@ -23,9 +24,10 @@ class QuestionDashboard < Administrate::BaseDashboard
   # By default, it's limited to four items to reduce clutter on index pages.
   # Feel free to add, remove, or rearrange items.
   COLLECTION_ATTRIBUTES = [
-    :metric,
     :id,
-    :title,
+    :metric,
+    :en,
+    :th,
     :options,
   ].freeze
 
@@ -35,7 +37,8 @@ class QuestionDashboard < Administrate::BaseDashboard
     :metric,
     :options,
     :id,
-    :title,
+    :en,
+    :th,
     :row_order,
     :created_at,
     :updated_at,
@@ -47,11 +50,12 @@ class QuestionDashboard < Administrate::BaseDashboard
   FORM_ATTRIBUTES = [
     :metric,
     :options,
-    :title,
+    :en,
+    :th,
     :row_order,
   ].freeze
 
   def display_resource(question)
-    question.title
+    question.title[:en]
   end
 end

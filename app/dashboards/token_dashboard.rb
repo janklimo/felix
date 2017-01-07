@@ -24,7 +24,6 @@ class TokenDashboard < Administrate::BaseDashboard
   COLLECTION_ATTRIBUTES = [
     :user,
     :company,
-    :id,
     :name,
   ].freeze
 

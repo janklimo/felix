@@ -11,10 +11,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170105095854) do
+ActiveRecord::Schema.define(version: 20170106021853) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+  enable_extension "citext"
 
   create_table "admins", force: :cascade do |t|
     t.string   "email",                  default: "",    null: false
@@ -51,33 +52,35 @@ ActiveRecord::Schema.define(version: 20170105095854) do
   add_index "companies", ["admin_id"], name: "index_companies_on_admin_id", using: :btree
 
   create_table "metrics", force: :cascade do |t|
-    t.string   "name",       default: "", null: false
     t.datetime "created_at",              null: false
     t.datetime "updated_at",              null: false
     t.string   "image_url"
+    t.jsonb    "name",       default: {}
   end
 
-  add_index "metrics", ["name"], name: "index_metrics_on_name", using: :btree
+  add_index "metrics", ["name"], name: "index_metrics_on_name", using: :gin
 
   create_table "options", force: :cascade do |t|
-    t.string   "title"
-    t.integer  "value",       default: 0, null: false
+    t.integer  "value",       default: 0,  null: false
     t.integer  "question_id"
-    t.datetime "created_at",              null: false
-    t.datetime "updated_at",              null: false
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+    t.jsonb    "title",       default: {}
   end
 
   add_index "options", ["question_id"], name: "index_options_on_question_id", using: :btree
+  add_index "options", ["title"], name: "index_options_on_title", using: :gin
 
   create_table "questions", force: :cascade do |t|
-    t.string   "title"
     t.integer  "row_order"
     t.integer  "metric_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
+    t.jsonb    "title",      default: {}
   end
 
   add_index "questions", ["metric_id"], name: "index_questions_on_metric_id", using: :btree
+  add_index "questions", ["title"], name: "index_questions_on_title", using: :gin
 
   create_table "tokens", force: :cascade do |t|
     t.string   "name",       null: false
