@@ -53,6 +53,9 @@ class BotController < ApplicationController
           end
         end
       when Line::Bot::Event::Postback
+        p "=========== DEBUG"
+        p event
+
         value = event['postback']['data']
 
         # let users change the language at any time

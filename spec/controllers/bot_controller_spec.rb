@@ -135,7 +135,7 @@ describe BotController, type: :controller do
   describe 'verified' do
     before do
       @user = create(:user, external_id: 'U1234', status: :verified)
-      metric = create(:metric, name: 'General')
+      metric = create(:metric, en: "General")
       question = create(:question, metric: metric)
       question.options << create(:option)
     end

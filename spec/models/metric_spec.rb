@@ -3,7 +3,7 @@ describe Metric, type: :model do
     metric = build(:metric)
     metric.name = nil
     expect(metric).not_to be_valid
-    metric.name = 'Money'
+    metric.name[:en] = 'Money'
     expect(metric).to be_valid
   end
 end

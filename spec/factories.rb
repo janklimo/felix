@@ -19,16 +19,16 @@ FactoryGirl.define do
   end
 
   factory :metric do
-    name 'General'
+    en 'General'
     image_url Faker::Internet.url
   end
 
   factory :option do
-    title 'Awesome!'
+    en 'Awesome!'
   end
 
   factory :question do
-    title 'Do you like coffee?'
+    en 'Do you like coffee?'
   end
 
   factory :token do

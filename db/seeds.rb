@@ -8,12 +8,15 @@
 
 # CONTENT
 # General
-general = Metric.create(name: 'General', image_url: 'https://s3.amazonaws.com/felixthebot/general_cover.png')
+general = Metric.create(en: 'About Felix', image_url: 'https://s3.amazonaws.com/felixthebot/general_cover.png')
 
 # Question #1
-welcome = Question.create(title: 'Is tracking how happy we are at work important?',
-                          metric: general)
-welcome.options << Option.create(title: "It's stupid", value: 0)
-welcome.options << Option.create(title: "I've seen worse", value: 33)
-welcome.options << Option.create(title: "I like it", value: 66)
-welcome.options << Option.create(title: "Love it!", value: 100)
+welcome = Question.create(
+  en: 'Is tracking how happy we are at work important?',
+  metric: general
+)
+
+welcome.options << Option.create(en: "It's stupid", value: 0)
+welcome.options << Option.create(en: "I've seen worse", value: 33)
+welcome.options << Option.create(en: "I like it", value: 66)
+welcome.options << Option.create(en: "Love it!", value: 100)
