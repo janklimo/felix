@@ -7,4 +7,7 @@ class Question < ActiveRecord::Base
 
   belongs_to :metric
   has_many :options
+
+  validates :en, :th, presence: true
+  validates :en, :th, length: { maximum: 60 }
 end
