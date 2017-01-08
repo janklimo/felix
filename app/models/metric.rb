@@ -2,6 +2,6 @@ class Metric < ActiveRecord::Base
   serialize :name, HashSerializer
   store_accessor :name, :en, :th
 
-  validates :name, presence: true
+  validates :en, :th, presence: true
   has_many :questions
 end

@@ -13,6 +13,7 @@ class Token < ActiveRecord::Base
     set_token_name if Token.exists?(name: self.name)
   end
 
+  # outputs a string of 5 to 6 characters long
   def random_token
     rand(36**6).to_s(36).upcase
   end
