@@ -13,6 +13,7 @@ class QuestionDashboard < Administrate::BaseDashboard
     id: Field::Number,
     en: Field::String,
     th: Field::String,
+    timing: Enum.with_options(searchable: false),
     row_order: Field::Number,
     created_at: Field::DateTime,
     updated_at: Field::DateTime,
@@ -29,6 +30,7 @@ class QuestionDashboard < Administrate::BaseDashboard
     :en,
     :th,
     :options,
+    :timing
   ].freeze
 
   # SHOW_PAGE_ATTRIBUTES
@@ -39,6 +41,7 @@ class QuestionDashboard < Administrate::BaseDashboard
     :id,
     :en,
     :th,
+    :timing,
     :row_order,
     :created_at,
     :updated_at,
@@ -52,6 +55,7 @@ class QuestionDashboard < Administrate::BaseDashboard
     :options,
     :en,
     :th,
+    :timing,
     :row_order,
   ].freeze
 

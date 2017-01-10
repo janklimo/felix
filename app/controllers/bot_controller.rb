@@ -41,6 +41,8 @@ class BotController < ApplicationController
               token.update(user: user)
               found_company = token.company
               user.update(company: found_company, status: :verified)
+
+              # create FeedbackRequest and send out the welcome question
               payload = [
                 text(I18n.t('company_found', name: found_company.name)),
                 text(I18n.t('what_happens_next'))
@@ -72,7 +74,10 @@ class BotController < ApplicationController
           end
         end
 
-        # TODO: process postback data
+        # process all the other postback data
+        if user && user.verified?
+
+        end
       end
       res = client.reply_message(event['replyToken'], payload) if payload
       p res.body if res

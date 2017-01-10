@@ -12,7 +12,7 @@ class UserDashboard < Administrate::BaseDashboard
     id: Field::Number,
     external_id: Field::String,
     language: Field::String,
-    status: Field::String.with_options(searchable: false),
+    status: Enum.with_options(searchable: false),
     created_at: Field::DateTime,
     updated_at: Field::DateTime,
   }.freeze

@@ -19,4 +19,13 @@ describe Question, type: :model do
     question.th = 'Money in Thai'
     expect(question).to be_valid
   end
+
+  it 'destroys dependent options' do
+    question = create(:question)
+    question.options << create(:option)
+    question.options << create(:option)
+    expect(Option.count).to eq 2
+    question.destroy!
+    expect(Option.count).to eq 0
+  end
 end

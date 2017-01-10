@@ -5,8 +5,10 @@ class Question < ActiveRecord::Base
   include RankedModel
   ranks :row_order
 
+  enum timing: [ :welcome, :weekly, :cycle ]
+
   belongs_to :metric
-  has_many :options
+  has_many :options, dependent: :destroy
 
   validates :en, :th, presence: true
   validates :en, :th, length: { maximum: 60 }

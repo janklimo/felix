@@ -1,6 +1,7 @@
 class Company < ActiveRecord::Base
   belongs_to :admin
   has_many :tokens
+  has_many :feedback_requests
 
   validates :name, presence: true
   validates :size, numericality: { greater_than: 0 }
