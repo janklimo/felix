@@ -3,16 +3,13 @@ describe BotController, type: :controller do
     allow_any_instance_of(Line::Bot::Client)
       .to receive(:reply_message)
     allow_any_instance_of(Line::Bot::Client)
-      .to receive(:get_profile).and_return double(body: 'anything')
-    allow_any_instance_of(Line::Bot::Client)
       .to receive(:validate_signature).and_return 'all good'
     @company = create(:company, size: 4)
   end
 
   describe 'new follow event' do
-    before do
-      allow(JSON).to receive(:parse).and_return mock_follow
-    end
+    include_context 'mock follow'
+
     it 'gets the user display name and says hello' do
       expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
         .with('T1234', [
@@ -35,9 +32,9 @@ describe BotController, type: :controller do
       @user = create(:user, external_id: 'U1234', status: :pending_language)
     end
     context 'receiving text we do not want' do
-      before do
-        allow(JSON).to receive(:parse).and_return mock_text('yada yada')
-      end
+      before { @mock_value = 'yada yada' }
+      include_context 'mock text'
+
       it 'asks for language confirmation' do
         expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
           .with('T1234',
@@ -49,9 +46,9 @@ describe BotController, type: :controller do
     end
 
     context 'receiving a language postback' do
-      before do
-        allow(JSON).to receive(:parse).and_return mock_postback('language=th')
-      end
+      before { @mock_value = 'language=th' }
+      include_context 'mock postback'
+
       it 'updates the user language and status, asks for a password' do
         expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
           .with('T1234', [
@@ -74,16 +71,25 @@ describe BotController, type: :controller do
       @token = Token.last
     end
     context 'company is found' do
+      before do
+        @question = create(:question_with_options, metric: create(:metric),
+                           timing: :welcome)
+      end
       context 'token matches' do
-        before do
-          allow(JSON).to receive(:parse).and_return mock_text(@token.name)
-        end
+        before { @mock_value = @token.name }
+        include_context 'mock text'
+
         it 'updates the user status and token itself' do
           expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
             .with('T1234', [
               hash_including(text: /Welcome to team Gotham Industries!/),
               hash_including(text: /Great job completing/),
+              hash_including(template: hash_including(
+                title: 'General',
+                text: 'Do you like coffee?'
+              ))
             ])
+          # TODO: test the feedback_request is created only once for the company
           post :callback
           expect(@user.reload.company).to eq @company
           expect(@user.reload.status).to eq 'verified'
@@ -92,10 +98,9 @@ describe BotController, type: :controller do
       end
 
       context 'the token is in the wrong case' do
-        before do
-          allow(JSON).to receive(:parse)
-            .and_return mock_text(@token.name.downcase)
-        end
+        before { @mock_value = @token.name.downcase }
+        include_context 'mock text'
+
         it 'updates the user status' do
           post :callback
           expect(@user.reload.company).to eq @company
@@ -104,10 +109,9 @@ describe BotController, type: :controller do
       end
 
       context 'the token is a part of a sentence' do
-        before do
-          allow(JSON).to receive(:parse)
-            .and_return mock_text("my password is #{@token.name} :)")
-        end
+        before { @mock_value = "my password is #{@token.name} :)" }
+        include_context 'mock text'
+
         it 'updates the user status' do
           post :callback
           expect(@user.reload.company).to eq @company
@@ -117,9 +121,9 @@ describe BotController, type: :controller do
     end
 
     context 'company is not found' do
-      before do
-        allow(JSON).to receive(:parse).and_return mock_text('no idea :(')
-      end
+      before { @mock_value = "no idea :(" }
+      include_context 'mock text'
+
       it 'updates the user status' do
         expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
           .with('T1234',
@@ -135,16 +139,15 @@ describe BotController, type: :controller do
   describe 'verified' do
     before do
       @user = create(:user, external_id: 'U1234', status: :verified)
-      metric = create(:metric, en: "General")
-      question = create(:question, metric: metric)
-      question.options << create(:option)
     end
 
     context 'switching the language' do
       before do
-        allow(JSON).to receive(:parse).and_return mock_postback('language=en')
+        @mock_value = 'language=en'
         @user.update(language: 'th')
       end
+      include_context 'mock postback'
+
       it 'switches the language, but does not request password' do
         expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
           .with('T1234', hash_including(text: /is now English/))
@@ -154,11 +157,24 @@ describe BotController, type: :controller do
       end
     end
 
-    context 'receiving text input' do
-      before do
-        allow(JSON).to receive(:parse).and_return mock_text('tokEN')
+    context 'receiving postback feedback' do
+      before { @mock_value = "feedback_request_id=1&value=100" }
+      include_context 'mock postback'
+
+      it 'sends out a thank you' do
+        expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
+          .with('T1234',
+            hash_including(text: /Thank you!/)
+          )
+        post :callback
       end
-      it 'sends a test template message' do
+    end
+
+    xcontext 'receiving text input' do
+      before { @mock_value = "tokEN" }
+      include_context 'mock text'
+
+      it 'saves it with a tag' do
         # TODO: check the right payload content
         expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
           .with('T1234', hash_including(type: /template/))

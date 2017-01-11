@@ -43,15 +43,20 @@ class BotController < ApplicationController
               user.update(company: found_company, status: :verified)
 
               # create FeedbackRequest and send out the welcome question
+              welcome_question = Question.welcome.first
+              feedback_request = found_company.feedback_requests
+                .find_or_create_by(question: welcome_question)
+
               payload = [
                 text(I18n.t('company_found', name: found_company.name)),
-                text(I18n.t('what_happens_next'))
+                text(I18n.t('what_happens_next')),
+                template_from_request(feedback_request)
               ]
             else
               payload = text(I18n.t('company_not_found'))
             end
           elsif user && user.verified?
-            payload = template_from_question(Question.last)
+            # TODO record textual feedback with tags
           end
         end
       when Line::Bot::Event::Postback
@@ -76,7 +81,10 @@ class BotController < ApplicationController
 
         # process all the other postback data
         if user && user.verified?
-
+          # TODO test if this question is not too old to be answered
+          if value.include? 'feedback_request'
+            payload = text(I18n.t('feedback_received'))
+          end
         end
       end
       res = client.reply_message(event['replyToken'], payload) if payload
@@ -102,21 +110,23 @@ class BotController < ApplicationController
     }
   end
 
-  def template_from_question(question)
+  def template_from_request(feedback_request)
+    question = feedback_request.question
     metric = question.metric
     {
       "type": "template",
-      "altText": question.title,
+      "altText": question.title[I18n.locale],
       "template": {
         "type": "buttons",
         "thumbnailImageUrl": metric.image_url,
-        "title": metric.name,
-        "text": question.title,
+        "title": metric.name[I18n.locale],
+        "text": question.title[I18n.locale],
         "actions": question.options.order(value: :desc).map do |option|
           {
             "type": "postback",
-            "label": option.title,
-            "data": "You chose: #{option.title}"
+            "label": option.title[I18n.locale],
+            "data": "feedback_request_id=#{feedback_request.id}&" \
+            "value=#{option.value}"
           }
         end
       }

@@ -6,6 +6,7 @@ require 'capybara/rspec'
 require 'webmock/rspec'
 
 Dir[Rails.root.join("spec/helpers/**/*.rb")].each { |f| require f }
+Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 
 Capybara.javascript_driver = :webkit
 

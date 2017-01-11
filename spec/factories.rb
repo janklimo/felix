@@ -25,13 +25,25 @@ FactoryGirl.define do
   end
 
   factory :option do
-    en 'Awesome!'
-    th 'Awesome! TH'
+    sequence :en do |n|
+      "Option ##{n}"
+    end
+    sequence :th do |n|
+      "Option ##{n} in TH"
+    end
   end
 
   factory :question do
     en 'Do you like coffee?'
     th 'Do you like coffee? TH'
+
+    factory :question_with_options do
+      after(:create) do |question|
+        [0, 33, 66, 100].each do |i|
+          create(:option, question: question, value: i)
+        end
+      end
+    end
   end
 
   factory :token do
