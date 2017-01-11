@@ -80,6 +80,7 @@ describe BotController, type: :controller do
         include_context 'mock text'
 
         it 'updates the user status and token itself' do
+          token_count = Token.count
           expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
             .with('T1234', [
               hash_including(text: /Welcome to team Gotham Industries!/),
@@ -94,6 +95,10 @@ describe BotController, type: :controller do
           expect(@user.reload.company).to eq @company
           expect(@user.reload.status).to eq 'verified'
           expect(@token.reload.user).to eq @user
+
+          # make sure the token is intact
+          expect(@token.reload.name).to eq @mock_value
+          expect(Token.count).to eq token_count
         end
       end
 

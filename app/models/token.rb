@@ -4,7 +4,7 @@ class Token < ActiveRecord::Base
 
   validates :name, presence: true, uniqueness: true
 
-  before_validation :set_token_name
+  before_validation :set_token_name, on: :create
 
   private
 
