@@ -12,6 +12,7 @@ class UserDashboard < Administrate::BaseDashboard
     id: Field::Number,
     external_id: Field::String,
     language: Field::String,
+    token: Field::HasOne,
     status: Enum.with_options(searchable: false),
     created_at: Field::DateTime,
     updated_at: Field::DateTime,
@@ -34,6 +35,7 @@ class UserDashboard < Administrate::BaseDashboard
   # an array of attributes that will be displayed on the model's show page.
   SHOW_PAGE_ATTRIBUTES = [
     :company,
+    :token,
     :id,
     :external_id,
     :status,
