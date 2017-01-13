@@ -36,22 +36,30 @@ class BotController < ApplicationController
           if user && user.pending_language?
             payload = text(I18n.t('request_language_selection'))
           elsif user && user.pending_password?
+            # company found
             if keyword = Token.pluck(:name).find { |str| text.include? str }
               token = Token.find_by(name: keyword)
-              token.update(user: user)
-              found_company = token.company
-              user.update(company: found_company, status: :verified)
 
-              # create FeedbackRequest and send out the welcome question
-              welcome_question = Question.welcome.first
-              feedback_request = found_company.feedback_requests
-                .find_or_create_by(question: welcome_question)
+              # handle available/taken tokens
+              if token.user_id
+                payload = text(I18n.t('token_is_taken'))
+              else
+                token.update(user: user)
+                found_company = token.company
+                user.update(company: found_company, status: :verified)
 
-              payload = [
-                text(I18n.t('company_found', name: found_company.name)),
-                text(I18n.t('what_happens_next')),
-                template_from_request(feedback_request)
-              ]
+                # create FeedbackRequest and send out the welcome question
+                welcome_question = Question.welcome.first
+                feedback_request = found_company.feedback_requests
+                  .find_or_create_by(question: welcome_question)
+
+                payload = [
+                  text(I18n.t('company_found', name: found_company.name)),
+                  text(I18n.t('what_happens_next')),
+                  template_from_request(feedback_request)
+                ]
+              end
+            # company not found
             else
               payload = text(I18n.t('company_not_found'))
             end

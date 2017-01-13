@@ -18,4 +18,14 @@ describe Token, type: :model do
       end
     end
   end
+
+  describe 'available' do
+    before do
+      @token_1 = create(:token)
+      @token_2 = create(:token, user: create(:user))
+    end
+    it 'lists only tokens without associated users' do
+      expect(Token.available).to eq [@token_1]
+    end
+  end
 end

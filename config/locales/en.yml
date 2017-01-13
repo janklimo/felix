@@ -8,8 +8,10 @@ en:
   language_selection_confirmed: "That worked! Your language is now English 👍"
   request_language_selection: "Please confirm your language."
   request_password: "Let me find your company 🚀 All I need
-    is your personal secret keyword you received from your admin
+    is your personal secret token you received from your admin
     so I can securely identify it."
+  token_is_taken: "Unfortunately, somebody already used that token.
+    Please try again with a different one."
   what_happens_next: "Great job completing the registration 👏
     Soon I will start sending you questions about how you're
     feeling at work. Your responses are 100% anonymous so don't be

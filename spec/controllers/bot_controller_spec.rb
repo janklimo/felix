@@ -90,7 +90,6 @@ describe BotController, type: :controller do
                 text: 'Do you like coffee?'
               ))
             ])
-          # TODO: test the feedback_request is created only once for the company
           post :callback
           expect(@user.reload.company).to eq @company
           expect(@user.reload.status).to eq 'verified'
@@ -99,6 +98,31 @@ describe BotController, type: :controller do
           # make sure the token is intact
           expect(@token.reload.name).to eq @mock_value
           expect(Token.count).to eq token_count
+        end
+
+        context 'the feedback request already exists' do
+          before do
+            @fr = create(:feedback_request, question: @question,
+                         company: @company)
+          end
+          it 'does not create a new feedback request' do
+            post :callback
+            expect(FeedbackRequest.count).to eq 1
+            expect(FeedbackRequest.last).to eq @fr
+          end
+        end
+
+        context 'the token is taken' do
+          before { @token.update(user: @user) }
+          it 'does not update the user and tells him why' do
+            expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
+              .with('T1234',
+                hash_including(text: /somebody already used/)
+              )
+            post :callback
+            expect(@user.reload.company).to eq nil
+            expect(@user.reload.status).to eq 'pending_password'
+          end
         end
       end
 
@@ -129,7 +153,7 @@ describe BotController, type: :controller do
       before { @mock_value = "no idea :(" }
       include_context 'mock text'
 
-      it 'updates the user status' do
+      it 'does not update the user status' do
         expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
           .with('T1234',
             hash_including(text: /doesn't match any of the companies/)

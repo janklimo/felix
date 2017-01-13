@@ -6,6 +6,8 @@ class Token < ActiveRecord::Base
 
   before_validation :set_token_name, on: :create
 
+  scope :available, -> { where(user_id: nil) }
+
   private
 
   def set_token_name

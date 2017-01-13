@@ -18,6 +18,9 @@ FactoryGirl.define do
     size 2
   end
 
+  factory :feedback_request do
+  end
+
   factory :metric do
     en 'General'
     th 'General TH'
