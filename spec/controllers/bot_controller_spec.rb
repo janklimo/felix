@@ -203,6 +203,16 @@ describe BotController, type: :controller do
         expect(@user.feedbacks.first.value).to eq 100
       end
 
+      it "can respond to an old question if they haven't yet" do
+        @fr.update(created_at: 5.days.ago)
+        expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
+          .with('T1234', hash_including(text: /Thank you!/))
+        post :callback
+        expect(Feedback.count).to eq 1
+        expect(@user.feedbacks.first.feedback_request).to eq @fr
+        expect(@user.feedbacks.first.value).to eq 100
+      end
+
       context 'feedback already exists' do
         before do
           @feedback = create(:feedback, feedback_request: @fr,

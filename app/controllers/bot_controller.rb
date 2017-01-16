@@ -91,17 +91,17 @@ class BotController < ApplicationController
         if user && user.verified? && value.include?('feedback_request_id')
           data = Rack::Utils.parse_nested_query(value)
           feedback_request = FeedbackRequest.find(data['feedback_request_id'])
+          feedback = user.feedbacks.find_or_initialize_by(
+            feedback_request: feedback_request
+          )
 
           # do not permit answers to old questions
-          if (Time.now - feedback_request.created_at) < 3.days
-            feedback = user.feedbacks.find_or_initialize_by(
-              feedback_request: feedback_request
-            )
+          if feedback.persisted? && (Time.now - feedback_request.created_at) > 3.days
+            payload = text(I18n.t('feedback_request_too_old'))
+          else
             feedback.value = data['value']
             feedback.save!
             payload = text(I18n.t('feedback_received'))
-          else
-            payload = text(I18n.t('feedback_request_too_old'))
           end
         end
       end
