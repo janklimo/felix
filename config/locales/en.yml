@@ -3,16 +3,14 @@ en:
   company_not_found: "That doesn't match any of the companies
     I know 😞. Please try again!"
   feedback_received: 'Thank you! 🍻'
+  feedback_request_too_old: "That's a super old question you can
+    no longer respond to 😞"
   hello: "Hello amazing! I'm Felix, your team happiness
     bot 😻 Let's get started!"
   language_selection_confirmed: "That worked! Your language is now English 👍"
   request_language_selection: "Please confirm your language."
-  request_password: "Let me find your company 🚀 All I need
-    is your personal secret token you received from your admin
-    so I can securely identify it."
-  token_is_taken: "Unfortunately, somebody already used that token.
-    Please try again with a different one."
+  request_password: "Meow! Let's find your company 🚀 What's your password?"
+  token_is_taken: "Oops! Somebody already used that token.
+    Can you try again with a different one?"
   what_happens_next: "Great job completing the registration 👏
-    Soon I will start sending you questions about how you're
-    feeling at work. Your responses are 100% anonymous so don't be
-    afraid to say what you think. Let's try it right now 😊"
+    I'm a curious cat, let's try a quick question 😊"

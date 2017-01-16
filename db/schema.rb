@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170109153504) do
+ActiveRecord::Schema.define(version: 20170113090744) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -60,6 +60,19 @@ ActiveRecord::Schema.define(version: 20170109153504) do
 
   add_index "feedback_requests", ["company_id"], name: "index_feedback_requests_on_company_id", using: :btree
   add_index "feedback_requests", ["question_id"], name: "index_feedback_requests_on_question_id", using: :btree
+
+  create_table "feedbacks", force: :cascade do |t|
+    t.integer  "user_id"
+    t.integer  "feedback_request_id"
+    t.integer  "value",               default: 0, null: false
+    t.text     "text"
+    t.integer  "tag",                 default: 0, null: false
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+  end
+
+  add_index "feedbacks", ["feedback_request_id"], name: "index_feedbacks_on_feedback_request_id", using: :btree
+  add_index "feedbacks", ["user_id"], name: "index_feedbacks_on_user_id", using: :btree
 
   create_table "metrics", force: :cascade do |t|
     t.datetime "created_at",              null: false
@@ -120,6 +133,8 @@ ActiveRecord::Schema.define(version: 20170109153504) do
   add_foreign_key "companies", "admins"
   add_foreign_key "feedback_requests", "companies"
   add_foreign_key "feedback_requests", "questions"
+  add_foreign_key "feedbacks", "feedback_requests"
+  add_foreign_key "feedbacks", "users"
   add_foreign_key "options", "questions"
   add_foreign_key "questions", "metrics"
   add_foreign_key "tokens", "companies"

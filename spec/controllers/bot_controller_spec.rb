@@ -117,7 +117,7 @@ describe BotController, type: :controller do
           it 'does not update the user and tells him why' do
             expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
               .with('T1234',
-                hash_including(text: /somebody already used/)
+                hash_including(text: /Somebody already used/)
               )
             post :callback
             expect(@user.reload.company).to eq nil
@@ -187,15 +187,50 @@ describe BotController, type: :controller do
     end
 
     context 'receiving postback feedback' do
-      before { @mock_value = "feedback_request_id=1&value=100" }
+      before do
+        @fr = create(:feedback_request, question: create(:question),
+                     company: @company)
+        @mock_value = "feedback_request_id=#{@fr.id}&value=100"
+      end
       include_context 'mock postback'
 
-      it 'sends out a thank you' do
+      it 'sends out a thank you and records the feedback' do
         expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
-          .with('T1234',
-            hash_including(text: /Thank you!/)
-          )
+          .with('T1234', hash_including(text: /Thank you!/))
         post :callback
+        expect(Feedback.count).to eq 1
+        expect(@user.feedbacks.first.feedback_request).to eq @fr
+        expect(@user.feedbacks.first.value).to eq 100
+      end
+
+      context 'feedback already exists' do
+        before do
+          @feedback = create(:feedback, feedback_request: @fr,
+                             user: @user, value: 0)
+        end
+
+        context 'there is still time to update' do
+          it 'sends out a thank you and updates the feedback' do
+            expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
+              .with('T1234', hash_including(text: /Thank you!/))
+            post :callback
+            expect(Feedback.count).to eq 1
+            expect(@user.feedbacks.first.feedback_request).to eq @fr
+            expect(@user.feedbacks.first.value).to eq 100
+          end
+        end
+
+        context "can't edit anymore" do
+          it 'does not allow updates' do
+            @fr.update(created_at: 4.days.ago)
+            expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
+              .with('T1234', hash_including(text: /no longer respond/))
+            post :callback
+            expect(Feedback.count).to eq 1
+            expect(@user.feedbacks.first.feedback_request).to eq @fr
+            expect(@user.feedbacks.first.value).to eq 0
+          end
+        end
       end
     end
 

@@ -88,10 +88,20 @@ class BotController < ApplicationController
         end
 
         # process all the other postback data
-        if user && user.verified?
-          # TODO test if this question is not too old to be answered
-          if value.include? 'feedback_request'
+        if user && user.verified? && value.include?('feedback_request_id')
+          data = Rack::Utils.parse_nested_query(value)
+          feedback_request = FeedbackRequest.find(data['feedback_request_id'])
+
+          # do not permit answers to old questions
+          if (Time.now - feedback_request.created_at) < 3.days
+            feedback = user.feedbacks.find_or_initialize_by(
+              feedback_request: feedback_request
+            )
+            feedback.value = data['value']
+            feedback.save!
             payload = text(I18n.t('feedback_received'))
+          else
+            payload = text(I18n.t('feedback_request_too_old'))
           end
         end
       end
@@ -134,7 +144,7 @@ class BotController < ApplicationController
             "type": "postback",
             "label": option.title[I18n.locale],
             "data": "feedback_request_id=#{feedback_request.id}&" \
-            "value=#{option.value}"
+              "value=#{option.value}"
           }
         end
       }
