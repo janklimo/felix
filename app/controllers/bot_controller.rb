@@ -95,8 +95,9 @@ class BotController < ApplicationController
             feedback_request: feedback_request
           )
 
-          # do not permit answers to old questions
-          if feedback.persisted? && (Time.now - feedback_request.created_at) > 3.days
+          # do not permit answers to old questions except the welcome one
+          if feedback.persisted? && (Time.now - feedback_request.created_at) > 3.days &&
+              !feedback_request.question.welcome?
             payload = text(I18n.t('feedback_request_too_old'))
           else
             feedback.value = data['value']

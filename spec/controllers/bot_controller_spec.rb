@@ -232,7 +232,8 @@ describe BotController, type: :controller do
 
         context "can't edit anymore" do
           it 'does not allow updates' do
-            @fr.update(created_at: 4.days.ago)
+            @fr.update(created_at: 4.days.ago,
+                       question: create(:question, timing: :cycle))
             expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
               .with('T1234', hash_including(text: /no longer respond/))
             post :callback
