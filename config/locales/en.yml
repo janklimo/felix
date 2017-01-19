@@ -10,9 +10,9 @@ en:
   hello: "Hello amazing! I'm Felix, your team happiness
     bot 😻 Let's get started!"
   how_to_text: "It's easy 😊 To send me a problem or an idea, just use
-    PROBLEM or IDEA to begin your message. For example:\n\n
-    PROBLEM: Coffee machine is broken :(
-    IDEA: Let's play laser tag this Friday! 🎯\n\n
+    PROBLEM or IDEA to begin your message. For example:\n\n\
+    PROBLEM: Coffee machine is broken :(\n\
+    IDEA: Let's play laser tag this Friday! 🎯\n\n\
     Got anything to share now?"
   language_selection_confirmed: "That worked! Your language is now English 👍"
   privacy: "I'm here to listen and find out how to make you happy at work!
