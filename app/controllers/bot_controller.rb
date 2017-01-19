@@ -101,8 +101,20 @@ class BotController < ApplicationController
             payload = text(I18n.t('feedback_request_too_old'))
           else
             feedback.value = data['value']
+
+            # answering the 1st question - say what comes next
+            if feedback.new_record? && user.feedbacks.count == 0
+              payload = [
+                text(I18n.t('first_question_answered')),
+                text(I18n.t('privacy')),
+                text(I18n.t('text_me_anytime')),
+                text(I18n.t('how_to_text'))
+              ]
+            else
+              payload = text(I18n.t('feedback_received'))
+            end
+
             feedback.save!
-            payload = text(I18n.t('feedback_received'))
           end
         end
       end

@@ -116,9 +116,7 @@ describe BotController, type: :controller do
           before { @token.update(user: @user) }
           it 'does not update the user and tells him why' do
             expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
-              .with('T1234',
-                hash_including(text: /Somebody already used/)
-              )
+              .with('T1234', hash_including(text: /Somebody already used/))
             post :callback
             expect(@user.reload.company).to eq nil
             expect(@user.reload.status).to eq 'pending_password'
@@ -194,19 +192,31 @@ describe BotController, type: :controller do
       end
       include_context 'mock postback'
 
-      it 'sends out a thank you and records the feedback' do
-        expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
-          .with('T1234', hash_including(text: /Thank you!/))
-        post :callback
-        expect(Feedback.count).to eq 1
-        expect(@user.feedbacks.first.feedback_request).to eq @fr
-        expect(@user.feedbacks.first.value).to eq 100
+      context 'first answer ever' do
+        it 'sends out a thank you and records the feedback' do
+          expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
+            .with('T1234', [
+              hash_including(text: /your first question/),
+              hash_including(text: /100% anonymous/),
+              hash_including(text: /text me anytime/),
+              hash_including(text: /anything to share now/)
+            ])
+          post :callback
+          expect(Feedback.count).to eq 1
+          expect(@user.feedbacks.first.feedback_request).to eq @fr
+          expect(@user.feedbacks.first.value).to eq 100
+        end
       end
 
       it "can respond to an old question if they haven't yet" do
         @fr.update(created_at: 5.days.ago)
         expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
-          .with('T1234', hash_including(text: /Thank you!/))
+          .with('T1234', [
+            hash_including(text: /your first question/),
+            hash_including(text: /100% anonymous/),
+            hash_including(text: /text me anytime/),
+            hash_including(text: /anything to share now/)
+          ])
         post :callback
         expect(Feedback.count).to eq 1
         expect(@user.feedbacks.first.feedback_request).to eq @fr
@@ -222,7 +232,7 @@ describe BotController, type: :controller do
         context 'there is still time to update' do
           it 'sends out a thank you and updates the feedback' do
             expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
-              .with('T1234', hash_including(text: /Thank you!/))
+              .with('T1234', hash_including(text: /a happy cat/))
             post :callback
             expect(Feedback.count).to eq 1
             expect(@user.feedbacks.first.feedback_request).to eq @fr
