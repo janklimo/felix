@@ -119,7 +119,7 @@ class BotController < ApplicationController
         end
       end
 
-      client.reply(event['replyToken'], payload)
+      client.reply(event['replyToken'], payload, user_id)
     end
 
     head :ok

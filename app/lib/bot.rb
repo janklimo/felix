@@ -6,11 +6,15 @@ class Bot < Line::Bot::Client
     )
   end
 
-  def reply(token, payload)
+  def reply(token, payload, user_id)
     return unless payload
     payload = [payload] if payload.is_a? Hash
     payload.each_with_index do |message, i|
-      res = reply_message(token, message)
+      if i == 0
+        res = reply_message(token, message)
+      else
+        res = push_message(user_id, message)
+      end
       p res.body if res
       # act more natural by outputting the messages with a bit of a delay
       # don't sleep after the last message
