@@ -4,6 +4,8 @@ describe BotController, type: :controller do
       .to receive(:reply_message)
     allow_any_instance_of(Line::Bot::Client)
       .to receive(:validate_signature).and_return 'all good'
+    allow_any_instance_of(Line::Bot::Client)
+      .to receive(:sleep).and_return true
     @company = create(:company, size: 4)
   end
 
@@ -12,10 +14,9 @@ describe BotController, type: :controller do
 
     it 'gets the user display name and says hello' do
       expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
-        .with('T1234', [
-          hash_including(text: /Hello amazing! I'm Felix/),
-          hash_including(template: hash_including(title: 'Language'))
-        ])
+        .with 'T1234', hash_including(text: /Hello amazing! I'm Felix/)
+      expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
+        .with 'T1234', hash_including(template: hash_including(title: 'Language'))
       post :callback
     end
     it 'saves the user with a pending language status' do
@@ -37,9 +38,7 @@ describe BotController, type: :controller do
 
       it 'asks for language confirmation' do
         expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
-          .with('T1234',
-            hash_including(text: /Please confirm your language/),
-          )
+          .with 'T1234', hash_including(text: /Please confirm your language/)
         post :callback
         expect(@user.reload.status).to eq 'pending_language'
       end
@@ -51,10 +50,9 @@ describe BotController, type: :controller do
 
       it 'updates the user language and status, asks for a password' do
         expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
-          .with('T1234', [
-            hash_including(text: /ภาษาไทยแล้ว/),
-            hash_including(text: /TODO/)
-          ])
+          .with 'T1234', hash_including(text: /ภาษาไทยแล้ว/)
+        expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
+          .with 'T1234', hash_including(text: /TODO/)
         post :callback
         expect(@user.reload.status).to eq 'pending_password'
         expect(@user.reload.language).to eq 'th'
@@ -82,14 +80,13 @@ describe BotController, type: :controller do
         it 'updates the user status and token itself' do
           token_count = Token.count
           expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
-            .with('T1234', [
-              hash_including(text: /Welcome to team Gotham Industries!/),
-              hash_including(text: /Great job completing/),
-              hash_including(template: hash_including(
-                title: 'General',
-                text: 'Do you like coffee?'
-              ))
-            ])
+            .with 'T1234', hash_including(text: /Welcome to team Gotham Industries!/)
+          expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
+            .with 'T1234', hash_including(text: /Great job completing/)
+          expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
+            .with 'T1234', hash_including(template: hash_including(
+              title: 'General',
+              text: 'Do you like coffee?'))
           post :callback
           expect(@user.reload.company).to eq @company
           expect(@user.reload.status).to eq 'verified'
@@ -116,7 +113,7 @@ describe BotController, type: :controller do
           before { @token.update(user: @user) }
           it 'does not update the user and tells him why' do
             expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
-              .with('T1234', hash_including(text: /Somebody already used/))
+              .with 'T1234', hash_including(text: /Somebody already used/)
             post :callback
             expect(@user.reload.company).to eq nil
             expect(@user.reload.status).to eq 'pending_password'
@@ -153,9 +150,7 @@ describe BotController, type: :controller do
 
       it 'does not update the user status' do
         expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
-          .with('T1234',
-            hash_including(text: /doesn't match any of the companies/)
-          )
+          .with 'T1234', hash_including(text: /doesn't match any of the companies/)
         post :callback
         expect(@user.reload.company).to eq nil
         expect(@user.reload.status).to eq 'pending_password'
@@ -177,7 +172,7 @@ describe BotController, type: :controller do
 
       it 'switches the language, but does not request password' do
         expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
-          .with('T1234', hash_including(text: /is now English/))
+          .with 'T1234', hash_including(text: /is now English/)
         post :callback
         expect(@user.reload.language).to eq 'en'
         expect(I18n.locale).to eq :en
@@ -195,12 +190,13 @@ describe BotController, type: :controller do
       context 'first answer ever' do
         it 'sends out a thank you and records the feedback' do
           expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
-            .with('T1234', [
-              hash_including(text: /your first question/),
-              hash_including(text: /100% anonymous/),
-              hash_including(text: /text me anytime/),
-              hash_including(text: /anything to share now/)
-            ])
+            .with 'T1234', hash_including(text: /your first question/)
+          expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
+            .with 'T1234', hash_including(text: /100% anonymous/)
+          expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
+            .with 'T1234', hash_including(text: /text me anytime/)
+          expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
+            .with 'T1234', hash_including(text: /anything to share now/)
           post :callback
           expect(Feedback.count).to eq 1
           expect(@user.feedbacks.first.feedback_request).to eq @fr
@@ -211,12 +207,13 @@ describe BotController, type: :controller do
       it "can respond to an old question if they haven't yet" do
         @fr.update(created_at: 5.days.ago)
         expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
-          .with('T1234', [
-            hash_including(text: /your first question/),
-            hash_including(text: /100% anonymous/),
-            hash_including(text: /text me anytime/),
-            hash_including(text: /anything to share now/)
-          ])
+          .with 'T1234', hash_including(text: /your first question/)
+        expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
+          .with 'T1234', hash_including(text: /100% anonymous/)
+        expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
+          .with 'T1234', hash_including(text: /text me anytime/)
+        expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
+          .with 'T1234', hash_including(text: /anything to share now/)
         post :callback
         expect(Feedback.count).to eq 1
         expect(@user.feedbacks.first.feedback_request).to eq @fr
@@ -232,7 +229,7 @@ describe BotController, type: :controller do
         context 'there is still time to update' do
           it 'sends out a thank you and updates the feedback' do
             expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
-              .with('T1234', hash_including(text: /a happy cat/))
+              .with 'T1234', hash_including(text: /a happy cat/)
             post :callback
             expect(Feedback.count).to eq 1
             expect(@user.feedbacks.first.feedback_request).to eq @fr
@@ -245,7 +242,7 @@ describe BotController, type: :controller do
             @fr.update(created_at: 4.days.ago,
                        question: create(:question, timing: :cycle))
             expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
-              .with('T1234', hash_including(text: /no longer respond/))
+              .with 'T1234', hash_including(text: /no longer respond/)
             post :callback
             expect(Feedback.count).to eq 1
             expect(@user.feedbacks.first.feedback_request).to eq @fr
@@ -262,7 +259,7 @@ describe BotController, type: :controller do
       it 'saves it with a tag' do
         # TODO: check the right payload content
         expect_any_instance_of(Line::Bot::Client).to receive(:reply_message)
-          .with('T1234', hash_including(type: /template/))
+          .with 'T1234', hash_including(type: /template/)
         post :callback
       end
     end

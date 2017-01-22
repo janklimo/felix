@@ -25,8 +25,8 @@ class BotController < ApplicationController
         # save the user record
         User.create(external_id: user_id)
         payload = [
-          text(I18n.t('hello')),
-          language_selection
+          client.text(I18n.t('hello')),
+          client.language_selection
         ]
       when Line::Bot::Event::Message
         case event.type
@@ -34,7 +34,7 @@ class BotController < ApplicationController
           text = event['message']['text'].upcase
 
           if user && user.pending_language?
-            payload = text(I18n.t('request_language_selection'))
+            payload = client.text(I18n.t('request_language_selection'))
           elsif user && user.pending_password?
             # company found
             if keyword = Token.pluck(:name).find { |str| text.include? str }
@@ -42,7 +42,7 @@ class BotController < ApplicationController
 
               # handle available/taken tokens
               if token.user_id
-                payload = text(I18n.t('token_is_taken'))
+                payload = client.text(I18n.t('token_is_taken'))
               else
                 token.update(user: user)
                 found_company = token.company
@@ -54,14 +54,14 @@ class BotController < ApplicationController
                   .find_or_create_by(question: welcome_question)
 
                 payload = [
-                  text(I18n.t('company_found', name: found_company.name)),
-                  text(I18n.t('what_happens_next')),
-                  template_from_request(feedback_request)
+                  client.text(I18n.t('company_found', name: found_company.name)),
+                  client.text(I18n.t('what_happens_next')),
+                  client.template_from_request(feedback_request)
                 ]
               end
             # company not found
             else
-              payload = text(I18n.t('company_not_found'))
+              payload = client.text(I18n.t('company_not_found'))
             end
           elsif user && user.verified?
             # TODO record textual feedback with tags
@@ -78,12 +78,12 @@ class BotController < ApplicationController
           if user.pending_language?
             user.update(language: language, status: :pending_password)
             payload = [
-              text(I18n.t('language_selection_confirmed')),
-              text(I18n.t('request_password'))
+              client.text(I18n.t('language_selection_confirmed')),
+              client.text(I18n.t('request_password'))
             ]
           else
             user.update(language: language)
-            payload = text(I18n.t('language_selection_confirmed'))
+            payload = client.text(I18n.t('language_selection_confirmed'))
           end
         end
 
@@ -98,28 +98,28 @@ class BotController < ApplicationController
           # do not permit answers to old questions except the welcome one
           if feedback.persisted? && (Time.now - feedback_request.created_at) > 3.days &&
               !feedback_request.question.welcome?
-            payload = text(I18n.t('feedback_request_too_old'))
+            payload = client.text(I18n.t('feedback_request_too_old'))
           else
             feedback.value = data['value']
 
             # answering the 1st question - say what comes next
             if feedback.new_record? && user.feedbacks.count == 0
               payload = [
-                text(I18n.t('first_question_answered')),
-                text(I18n.t('privacy')),
-                text(I18n.t('text_me_anytime')),
-                text(I18n.t('how_to_text'))
+                client.text(I18n.t('first_question_answered')),
+                client.text(I18n.t('privacy')),
+                client.text(I18n.t('text_me_anytime')),
+                client.text(I18n.t('how_to_text'))
               ]
             else
-              payload = text(I18n.t('feedback_received'))
+              payload = client.text(I18n.t('feedback_received'))
             end
 
             feedback.save!
           end
         end
       end
-      res = client.reply_message(event['replyToken'], payload) if payload
-      p res.body if res
+
+      client.reply(event['replyToken'], payload)
     end
 
     head :ok
@@ -129,60 +129,5 @@ class BotController < ApplicationController
 
   def client
     @client ||= Bot.new
-  end
-
-  def text(content)
-    {
-      type: 'text',
-      text: content
-    }
-  end
-
-  def template_from_request(feedback_request)
-    question = feedback_request.question
-    metric = question.metric
-    {
-      "type": "template",
-      "altText": question.title[I18n.locale],
-      "template": {
-        "type": "buttons",
-        "thumbnailImageUrl": metric.image_url,
-        "title": metric.name[I18n.locale],
-        "text": question.title[I18n.locale],
-        "actions": question.options.order(value: :desc).map do |option|
-          {
-            "type": "postback",
-            "label": option.title[I18n.locale],
-            "data": "feedback_request_id=#{feedback_request.id}&" \
-              "value=#{option.value}"
-          }
-        end
-      }
-    }
-  end
-
-  def language_selection
-    {
-      "type": "template",
-      "altText": "Please choose your language.",
-      "template": {
-        "type": "buttons",
-        "thumbnailImageUrl": "https://s3.amazonaws.com/felixthebot/hello.jpg",
-        "title": "Language",
-        "text": "What language should I speak?",
-        "actions": [
-          {
-            "type": "postback",
-            "label": 'English',
-            "data": "language=en"
-          },
-          {
-            "type": "postback",
-            "label": 'ภาษาไทย',
-            "data": "language=th"
-          }
-        ]
-      }
-    }
   end
 end
