@@ -4,6 +4,7 @@ class FeedbackRequestDashboard < Administrate::BaseDashboard
   ATTRIBUTE_TYPES = {
     company: Field::BelongsTo,
     question: Field::BelongsTo,
+    feedbacks: Field::HasMany,
     id: Field::Number,
     created_at: Field::DateTime,
     updated_at: Field::DateTime,
@@ -13,6 +14,7 @@ class FeedbackRequestDashboard < Administrate::BaseDashboard
     :id,
     :company,
     :question,
+    :feedbacks,
     :created_at,
   ].freeze
 
@@ -20,6 +22,7 @@ class FeedbackRequestDashboard < Administrate::BaseDashboard
     :id,
     :company,
     :question,
+    :feedbacks,
     :created_at,
     :updated_at,
   ].freeze
