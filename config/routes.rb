@@ -6,6 +6,8 @@ Rails.application.routes.draw do
     resources :questions
     resources :tokens
     resources :users
+    resources :feedback_requests
+    resources :feedbacks
 
     root to: "companies#index"
   end
