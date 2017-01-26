@@ -18,7 +18,7 @@ class Bot < Line::Bot::Client
       p res.body if res
       # act more natural by outputting the messages with a bit of a delay
       # don't sleep after the last message
-      sleep 2 unless payload.size == (i + 1)
+      sleep 4 unless payload.size == (i + 1)
     end
   end
 
